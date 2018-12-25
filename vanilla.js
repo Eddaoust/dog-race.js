@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', function(){
             .then(res => res.json())
             .then(function(res){
                 const raceCountryPlaceholder = document.createElement('option')
-                raceCountryPlaceholder.setAttribute('selected', true)
-                raceCountryPlaceholder.setAttribute('disabled', true)
+                raceCountryPlaceholder.selected = true
+                raceCountryPlaceholder.disabled = true
                 raceCountryPlaceholder.innerText = 'Choisissez le pays de la course'
                 raceCountry.appendChild(raceCountryPlaceholder)
                 for(data of res){
                     const raceCountryOption = document.createElement('option')
-                    raceCountryOption.setAttribute('value', `${data.codeP}`)
+                    raceCountryOption.value = data.codeP
                     raceCountryOption.innerText = data.nomP
                     raceCountry.appendChild(raceCountryOption)
                 }
@@ -31,12 +31,13 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function raceRegistration(){
-        //TODO Gérer l'exeption des inputs vides
-        raceName.setAttribute('disabled', true)
-        raceCountry.setAttribute('disabled', true)
-        raceDuration.setAttribute('disabled', true)
+        // Désactivation des inputs après validation
+        raceName.disabled = true
+        raceCountry.disabled = true
+        raceDuration.disabled = true
         btnRaceRegistration.remove()
 
+        // Création du formulaire d'ajout des chiens
         const label = document.createElement('label')
         label.setAttribute('for', 'dog_select')
         label.innerText = 'Choississez un chien'
@@ -45,31 +46,33 @@ document.addEventListener('DOMContentLoaded', function(){
         dogSelect.setAttribute('id', 'dog_select')
         container.appendChild(dogSelect)
         const btnDogRegistration = document.createElement('input')
-        btnDogRegistration.setAttribute('type', 'button')
-        btnDogRegistration.setAttribute('value', 'inscrire')
-        btnDogRegistration.setAttribute('id', 'dog_register')
+        btnDogRegistration.type = 'button'
+        btnDogRegistration.value = 'Inscrire'
+        btnDogRegistration.id = 'dog_register'
         container.appendChild(btnDogRegistration)
         const btnDogEndRegistration = document.createElement('input')
-        btnDogEndRegistration.setAttribute('type', 'button')
-        btnDogEndRegistration.setAttribute('value', 'Cloturer les inscriptions')
-        btnDogEndRegistration.setAttribute('id', 'dog_end_registration')
+        btnDogEndRegistration.type = 'button'
+        btnDogEndRegistration.value = 'Cloturer les inscriptions'
+        btnDogEndRegistration.id = 'dog_end_registration'
         container.appendChild(btnDogEndRegistration)
 
         // Event ajout chien
         btnDogRegistration.addEventListener('click', dogRegistration)
 
+        // Requete pour remplir la liste des chiens avec les data
         fetch('./rqListeAnimaux.php')
             .then(res => res.json())
             .then(function(res){
                 const dogSelectPlaceholder = document.createElement('option')
-                dogSelectPlaceholder.setAttribute('selected', true)
-                dogSelectPlaceholder.setAttribute('disabled', true)
+                dogSelectPlaceholder.selected = true
+                dogSelectPlaceholder.disabled = true
                 dogSelectPlaceholder.innerText = 'Choisissez un chien'
                 dogSelect.appendChild(dogSelectPlaceholder)
                 for(data of res){
+                    // Push des data dans une variable globale
                     dogList.push(data)
                     const dogSelectOption = document.createElement('option')
-                    dogSelectOption.setAttribute('value', `${data.idA}`)
+                    dogSelectOption.value = data.idA
                     dogSelectOption.innerText = data.nomA
                     dogSelect.appendChild(dogSelectOption)
                 }
@@ -77,13 +80,16 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function dogRegistration(){
+        // Sélection de la liste déroulante des chiens
         const dogSelect = document.querySelector('#dog_select')
+        // Sélection des options de la liste
         const dogOption = document.querySelectorAll('#dog_select option')
+        // Loop pour obtenir le cien sélectionné
         for(let i = 0; i < dogOption.length; i++){
-            if(dogOption[i].getAttribute('value') === dogSelect.value){
-                dogOption[i].setAttribute('disabled', true)
+            if(dogOption[i].value === dogSelect.value){
+                dogOption[i].disabled = true
 
-                // Sélection du chien
+                // Sélection du chien data
                 const selectedDog = dogList.find(function (element) {
                     return element.idA == dogSelect.value
                 })
@@ -94,9 +100,9 @@ document.addEventListener('DOMContentLoaded', function(){
                 const dogCountry = document.createElement('th')
                 const dogDesc = document.createElement('th')
                 const dogDelete = document.createElement('input')
-                dogDelete.setAttribute('type', 'button')
-                dogDelete.setAttribute('value', 'supprimer')
-                dogDelete.setAttribute('id', 'dog_delete')
+                dogDelete.type = 'button'
+                dogDelete.value = 'Supprimer'
+                dogDelete.id = 'dog_delete'
 
                 // Attribution des données en fonction du chien sélectionné
                 dogId.innerHTML = selectedDog.idA
@@ -116,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
                 // Suppression de la ligne au click sur supprimer
                 dogDelete.addEventListener('click', function () {
+                    console.log(this.parentNode)
                     this.parentNode.remove()
 
 
