@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 })
                 // Création des éléments du tableau
                 const dogRowCloned = dogRow.cloneNode()
+                dogRowCloned.id = dogOption[i].value
                 const dogId = document.createElement('th')
                 const dogName = document.createElement('th')
                 const dogCountry = document.createElement('th')
@@ -120,11 +121,17 @@ document.addEventListener('DOMContentLoaded', function(){
                 // Insertion de la ligne dans le tableau
                 dogContainer.appendChild(dogRowCloned)
 
+                // Déplacement du curseur sur le placeholder
+                dogOption[0].selected = true
+
                 // Suppression de la ligne au click sur supprimer
                 dogDelete.addEventListener('click', function () {
-                    console.log(this.parentNode)
                     this.parentNode.remove()
-
+                    for(const option of dogOption) {
+                        if(this.parentNode.id == option.value){
+                            option.disabled = false
+                        }
+                    }
 
                 })
             }
