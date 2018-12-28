@@ -14,15 +14,19 @@
         <label for="race_country">Pays: </label>
         <select id="race_country"></select><br>
         <label for="race_duration">Durée de la course: </label>
-        <input type="text" id="race_duration" placeholder="Entrez une durée en seconde"><br>
+        <input type="time" id="race_duration" placeholder="Entrez une durée en seconde"><br>
         <input type="button" id="race_registration" value="Commencer les inscriptions"><br><br>
     </div>
-    <table class="dog_container">
-        <tr id="dog_row"></tr>
-    </table>
+    <div class="container">
+        <table>
+            <tbody class="dog_container">
+                <tr id="dog_row"></tr>
+            </tbody>
+        </table>
+    </div>
 
 
-
+    <script src="easytimer.js"></script>
     <script src="vanilla.js"></script>
 </body>
 </html>

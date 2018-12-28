@@ -59,6 +59,11 @@ document.addEventListener('DOMContentLoaded', function(){
         // Event ajout chien
         btnDogRegistration.addEventListener('click', dogRegistration)
 
+        //TODO Ajouter une exeption ne pas commencer la course si pas d'inscrit
+
+        // Event cloture de la course
+        btnDogEndRegistration.addEventListener('click', closeRaceRegistration)
+
         // Requete pour remplir la liste des chiens avec les data
         fetch('./rqListeAnimaux.php')
             .then(res => res.json())
@@ -138,12 +143,82 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     }
 
+    function closeRaceRegistration(){
+        // Suppression des inputs de la phase de sélection des chiens
+        const labelToRemove = Array.from(document.querySelectorAll('label')).find(function(element){
+            return element.getAttribute('for') === 'dog_select'
+        })
+        labelToRemove.remove()
+        document.querySelector('#dog_select').remove()
+        document.querySelector('#dog_register').remove()
+        document.querySelector('#dog_end_registration').remove()
+
+        // Création des inputs de controle de la course
+        const raceStart = document.createElement('input')
+        raceStart.id = 'race_start'
+        raceStart.type = 'button'
+        raceStart.value = 'Start'
+        const timerDisplay = document.createElement('input')
+        timerDisplay.type = 'time'
+        timerDisplay.id = 'timer_display'
+        const label = document.createElement('label')
+        label.setAttribute('for', 'timer_display_remainning')
+        label.innerText = 'Temps restant'
+        const timerDisplayRemaining = document.createElement('input')
+        timerDisplayRemaining.type = 'time'
+        timerDisplayRemaining.id = 'timer_display_remaining'
+        container.appendChild(raceStart)
+        container.appendChild(timerDisplay)
+        container.appendChild(label)
+        container.appendChild(timerDisplayRemaining)
+
+        // Suppression des bouttons 'supprimer' dans chaque ligne du tableau
+        const inputToDelete = Array.from(document.querySelectorAll('tr input'))
+        inputToDelete.map(function(element){
+            element.remove()
+        })
+
+        // Création des inputs de fin de course
+        const raceStop = document.createElement('input')
+        raceStop.type = 'button'
+        raceStop.id = 'race_stop'
+        raceStop.value = 'Stop'
+        const raceAbort = document.createElement('input')
+        raceAbort.type = 'button'
+        raceAbort.id = 'race_abort'
+        raceAbort.value = 'Abandon'
+
+        const trToFill = Array.from(document.querySelectorAll('tr'))
+
+        trToFill.map(function(row) {
+            if(row.getAttribute('id') !== 'dog_row' ){
+                const raceStop = document.createElement('input')
+                raceStop.type = 'button'
+                raceStop.className = 'race_stop'
+                raceStop.value = 'Stop'
+                const raceAbort = document.createElement('input')
+                raceAbort.type = 'button'
+                raceAbort.className = 'race_abort'
+                raceAbort.value = 'Abandon'
+
+                row.insertBefore(raceAbort, row.firstChild)
+                row.insertBefore(raceStop, row.firstChild)
+            }
+        })
+
+
+
+    }
+
 
 
 
     /********************** Action *********************/
     raceCountryInit();
     btnRaceRegistration.addEventListener('click', raceRegistration)
+
+
+
 
 
 });
