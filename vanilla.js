@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', function(){
     const dogContainer = document.querySelector('.dog_container')
     const dogRow = document.querySelector('#dog_row')
     const dogList = []
+    const timer = new Timer()
 
-    /**
-     * Fonction qui initialise la course et rempli la sélection pays via Ajax
-     */
+
+     //Fonction qui initialise la course et rempli la sélection pays via Ajax
     function raceCountryInit(){
         fetch('./rqListePays.php')
             .then(res => res.json())
@@ -159,18 +159,22 @@ document.addEventListener('DOMContentLoaded', function(){
         raceStart.type = 'button'
         raceStart.value = 'Start'
         const timerDisplay = document.createElement('input')
-        timerDisplay.type = 'time'
+        timerDisplay.type = 'text'
         timerDisplay.id = 'timer_display'
+        timerDisplay.value = '00:00:00'
         const label = document.createElement('label')
         label.setAttribute('for', 'timer_display_remainning')
         label.innerText = 'Temps restant'
         const timerDisplayRemaining = document.createElement('input')
-        timerDisplayRemaining.type = 'time'
+        timerDisplayRemaining.type = 'text'
         timerDisplayRemaining.id = 'timer_display_remaining'
+        timerDisplayRemaining.value = '00:00:00'
         container.appendChild(raceStart)
         container.appendChild(timerDisplay)
         container.appendChild(label)
         container.appendChild(timerDisplayRemaining)
+
+        raceStart.addEventListener('click', raceBeginning)
 
         // Suppression des bouttons 'supprimer' dans chaque ligne du tableau
         const inputToDelete = Array.from(document.querySelectorAll('tr input'))
@@ -178,16 +182,7 @@ document.addEventListener('DOMContentLoaded', function(){
             element.remove()
         })
 
-        // Création des inputs de fin de course
-        const raceStop = document.createElement('input')
-        raceStop.type = 'button'
-        raceStop.id = 'race_stop'
-        raceStop.value = 'Stop'
-        const raceAbort = document.createElement('input')
-        raceAbort.type = 'button'
-        raceAbort.id = 'race_abort'
-        raceAbort.value = 'Abandon'
-
+        // Création et insertion des inputs de fin de course
         const trToFill = Array.from(document.querySelectorAll('tr'))
 
         trToFill.map(function(row) {
@@ -203,11 +198,33 @@ document.addEventListener('DOMContentLoaded', function(){
 
                 row.insertBefore(raceAbort, row.firstChild)
                 row.insertBefore(raceStop, row.firstChild)
+
+                raceStop.addEventListener('click', raceEnd)
+                raceAbort.addEventListener('click', raceAborted)
             }
         })
+    }
 
+    function raceBeginning() {
+        const timerDisplay = document.querySelector('#timer_display')
+        timer.start()
+        timer.addEventListener('started', function() {
+            timerDisplay.value = timer.getTimeValues().toString()
+        })
 
+        timer.addEventListener('secondsUpdated', function() {
+            timerDisplay.value = timer.getTimeValues().toString()
+        })
+    }
 
+    function raceEnd(){
+        this.id = timer.getTimeValues().toString()
+        console.log(this.id)
+    }
+
+    function raceAborted(){
+        timer.reset()
+        timer.stop()
     }
 
 
