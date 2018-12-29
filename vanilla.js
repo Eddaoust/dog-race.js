@@ -218,8 +218,12 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function raceEnd(){
-        this.id = timer.getTimeValues().toString()
-        console.log(this.id)
+        const currentRow = this.parentNode
+        const result = document.createElement('div')
+        currentRow.firstChild.remove()
+        currentRow.firstChild.remove()
+        result.innerText = timer.getTimeValues().toString()
+        currentRow.insertBefore(result, currentRow.firstChild)
     }
 
     function raceAborted(){
