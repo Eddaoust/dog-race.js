@@ -4,11 +4,13 @@ document.addEventListener('DOMContentLoaded', function(){
     const raceName = document.querySelector('#race_name')
     const raceCountry = document.querySelector('#race_country')
     const raceDuration = document.querySelector('#race_duration')
+    let raceDurationValue = []
     const btnRaceRegistration = document.querySelector('#race_registration')
     const dogContainer = document.querySelector('.dog_container')
     const dogRow = document.querySelector('#dog_row')
     const dogList = []
     const timer = new Timer()
+    const regex = new RegExp("^([0-9]{2}:){2}[0-9]{2}$")
 
 
      //Fonction qui initialise la course et rempli la sélection pays via Ajax
@@ -55,6 +57,8 @@ document.addEventListener('DOMContentLoaded', function(){
         btnDogEndRegistration.value = 'Cloturer les inscriptions'
         btnDogEndRegistration.id = 'dog_end_registration'
         container.appendChild(btnDogEndRegistration)
+
+        raceDurationValue = raceDuration.value.split(':');
 
         // Event ajout chien
         btnDogRegistration.addEventListener('click', dogRegistration)
@@ -163,17 +167,25 @@ document.addEventListener('DOMContentLoaded', function(){
         timerDisplay.id = 'timer_display'
         timerDisplay.value = '00:00:00'
         const label = document.createElement('label')
-        label.setAttribute('for', 'timer_display_remainning')
+        label.setAttribute('for', 'timer_display_remaining')
         label.innerText = 'Temps restant'
         const timerDisplayRemaining = document.createElement('input')
         timerDisplayRemaining.type = 'text'
         timerDisplayRemaining.id = 'timer_display_remaining'
         timerDisplayRemaining.value = '00:00:00'
+
+        // Test de la validité du temps
+        if(regex.test(raceDuration.value)){
+            timerDisplayRemaining.value = raceDuration.value
+        } else {
+            alert('Entrez un temps valide au format 00:00:00')
+        }
         container.appendChild(raceStart)
         container.appendChild(timerDisplay)
         container.appendChild(label)
         container.appendChild(timerDisplayRemaining)
 
+        // Event Start de la course
         raceStart.addEventListener('click', raceBeginning)
 
         // Suppression des bouttons 'supprimer' dans chaque ligne du tableau
@@ -207,7 +219,17 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function raceBeginning() {
         const timerDisplay = document.querySelector('#timer_display')
-        timer.start()
+        const timerDisplayRemaining = document.querySelector('#timer_display_remaining')
+
+        // Création du timer de temps restant
+        const countdown = new Timer()
+        countdown.start({countdown: true, startValues: {seconds: parseInt(raceDurationValue[2]), minutes: parseInt(raceDurationValue[1]), hours: parseInt(raceDurationValue[0])}})
+        countdown.addEventListener('secondsUpdated', function() {
+            timerDisplayRemaining.value = countdown.getTimeValues().toString()
+        })
+
+        // Démarage du timer avec la limite de temps entré par l'utilisateur
+        timer.start({target:{seconds: parseInt(raceDurationValue[2]), minutes: parseInt(raceDurationValue[1]), hours: parseInt(raceDurationValue[0])}})
         timer.addEventListener('started', function() {
             timerDisplay.value = timer.getTimeValues().toString()
         })
@@ -215,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function(){
         timer.addEventListener('secondsUpdated', function() {
             timerDisplay.value = timer.getTimeValues().toString()
         })
+
     }
 
     function raceEnd(){
