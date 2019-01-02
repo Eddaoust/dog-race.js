@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const dogRow = document.querySelector('#dog_row')
     const dogList = []
     const timer = new Timer()
+    const countdown = new Timer()
     const regex = new RegExp("^([0-9]{2}:){2}[0-9]{2}$")
 
 
@@ -33,59 +34,64 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function raceRegistration(){
-        // Désactivation des inputs après validation
-        raceName.disabled = true
-        raceCountry.disabled = true
-        raceDuration.disabled = true
-        btnRaceRegistration.remove()
+        // Test de la validité du temps
+        if(regex.test(raceDuration.value)){
+            // Désactivation des inputs après validation
+            raceName.disabled = true
+            raceCountry.disabled = true
+            raceDuration.disabled = true
+            btnRaceRegistration.remove()
 
-        // Création du formulaire d'ajout des chiens
-        const label = document.createElement('label')
-        label.setAttribute('for', 'dog_select')
-        label.innerText = 'Choississez un chien'
-        container.appendChild(label)
-        const dogSelect = document.createElement('select')
-        dogSelect.setAttribute('id', 'dog_select')
-        container.appendChild(dogSelect)
-        const btnDogRegistration = document.createElement('input')
-        btnDogRegistration.type = 'button'
-        btnDogRegistration.value = 'Inscrire'
-        btnDogRegistration.id = 'dog_register'
-        container.appendChild(btnDogRegistration)
-        const btnDogEndRegistration = document.createElement('input')
-        btnDogEndRegistration.type = 'button'
-        btnDogEndRegistration.value = 'Cloturer les inscriptions'
-        btnDogEndRegistration.id = 'dog_end_registration'
-        container.appendChild(btnDogEndRegistration)
+            // Création du formulaire d'ajout des chiens
+            const label = document.createElement('label')
+            label.setAttribute('for', 'dog_select')
+            label.innerText = 'Choississez un chien'
+            container.appendChild(label)
+            const dogSelect = document.createElement('select')
+            dogSelect.setAttribute('id', 'dog_select')
+            container.appendChild(dogSelect)
+            const btnDogRegistration = document.createElement('input')
+            btnDogRegistration.type = 'button'
+            btnDogRegistration.value = 'Inscrire'
+            btnDogRegistration.id = 'dog_register'
+            container.appendChild(btnDogRegistration)
+            const btnDogEndRegistration = document.createElement('input')
+            btnDogEndRegistration.type = 'button'
+            btnDogEndRegistration.value = 'Cloturer les inscriptions'
+            btnDogEndRegistration.id = 'dog_end_registration'
+            container.appendChild(btnDogEndRegistration)
 
-        raceDurationValue = raceDuration.value.split(':');
+            raceDurationValue = raceDuration.value.split(':');
 
-        // Event ajout chien
-        btnDogRegistration.addEventListener('click', dogRegistration)
+            // Event ajout chien
+            btnDogRegistration.addEventListener('click', dogRegistration)
 
-        //TODO Ajouter une exeption ne pas commencer la course si pas d'inscrit
+            //TODO Ajouter une exeption ne pas commencer la course si pas d'inscrit
 
-        // Event cloture de la course
-        btnDogEndRegistration.addEventListener('click', closeRaceRegistration)
+            // Event cloture de la course
+            btnDogEndRegistration.addEventListener('click', closeRaceRegistration)
 
-        // Requete pour remplir la liste des chiens avec les data
-        fetch('./rqListeAnimaux.php')
-            .then(res => res.json())
-            .then(function(res){
-                const dogSelectPlaceholder = document.createElement('option')
-                dogSelectPlaceholder.selected = true
-                dogSelectPlaceholder.disabled = true
-                dogSelectPlaceholder.innerText = 'Choisissez un chien'
-                dogSelect.appendChild(dogSelectPlaceholder)
-                for(data of res){
-                    // Push des data dans une variable globale
-                    dogList.push(data)
-                    const dogSelectOption = document.createElement('option')
-                    dogSelectOption.value = data.idA
-                    dogSelectOption.innerText = data.nomA
-                    dogSelect.appendChild(dogSelectOption)
-                }
-            })
+            // Requete pour remplir la liste des chiens avec les data
+            fetch('./rqListeAnimaux.php')
+                .then(res => res.json())
+                .then(function(res){
+                    const dogSelectPlaceholder = document.createElement('option')
+                    dogSelectPlaceholder.selected = true
+                    dogSelectPlaceholder.disabled = true
+                    dogSelectPlaceholder.innerText = 'Choisissez un chien'
+                    dogSelect.appendChild(dogSelectPlaceholder)
+                    for(data of res){
+                        // Push des data dans une variable globale
+                        dogList.push(data)
+                        const dogSelectOption = document.createElement('option')
+                        dogSelectOption.value = data.idA
+                        dogSelectOption.innerText = data.nomA
+                        dogSelect.appendChild(dogSelectOption)
+                    }
+                })
+        } else {
+            alert('Entrez un temps valide au format 00:00:00')
+        }
     }
 
     function dogRegistration(){
@@ -174,12 +180,9 @@ document.addEventListener('DOMContentLoaded', function(){
         timerDisplayRemaining.id = 'timer_display_remaining'
         timerDisplayRemaining.value = '00:00:00'
 
-        // Test de la validité du temps
-        if(regex.test(raceDuration.value)){
-            timerDisplayRemaining.value = raceDuration.value
-        } else {
-            alert('Entrez un temps valide au format 00:00:00')
-        }
+
+        timerDisplayRemaining.value = raceDuration.value
+
         container.appendChild(raceStart)
         container.appendChild(timerDisplay)
         container.appendChild(label)
@@ -211,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 row.insertBefore(raceAbort, row.firstChild)
                 row.insertBefore(raceStop, row.firstChild)
 
+                // Event
                 raceStop.addEventListener('click', raceEnd)
                 raceAbort.addEventListener('click', raceAborted)
             }
@@ -222,10 +226,23 @@ document.addEventListener('DOMContentLoaded', function(){
         const timerDisplayRemaining = document.querySelector('#timer_display_remaining')
 
         // Création du timer de temps restant
-        const countdown = new Timer()
         countdown.start({countdown: true, startValues: {seconds: parseInt(raceDurationValue[2]), minutes: parseInt(raceDurationValue[1]), hours: parseInt(raceDurationValue[0])}})
         countdown.addEventListener('secondsUpdated', function() {
             timerDisplayRemaining.value = countdown.getTimeValues().toString()
+        })
+
+        // Action si le temps limite est atteint
+        countdown.addEventListener('targetAchieved', function() {
+            const allTr = Array.from(document.querySelectorAll('table tr'))
+            allTr.map(function(tr) {
+                if(tr.firstChild && tr.firstChild.className === 'race_stop'){
+                    const result = document.createElement('div')
+                    tr.firstChild.remove()
+                    tr.firstChild.remove()
+                    result.innerText = 'Abandon'
+                    tr.insertBefore(result, tr.firstChild)
+                }
+            })
         })
 
         // Démarage du timer avec la limite de temps entré par l'utilisateur
@@ -250,8 +267,12 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function raceAborted(){
-        timer.reset()
-        timer.stop()
+        const currentRow = this.parentNode
+        const result = document.createElement('div')
+        currentRow.firstChild.remove()
+        currentRow.firstChild.remove()
+        result.innerText = 'Abandon'
+        currentRow.insertBefore(result, currentRow.firstChild)
     }
 
 
@@ -260,9 +281,4 @@ document.addEventListener('DOMContentLoaded', function(){
     /********************** Action *********************/
     raceCountryInit();
     btnRaceRegistration.addEventListener('click', raceRegistration)
-
-
-
-
-
 });
