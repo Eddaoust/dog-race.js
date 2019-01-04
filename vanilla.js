@@ -12,10 +12,11 @@ document.addEventListener('DOMContentLoaded', function(){
     const timer = new Timer()
     const countdown = new Timer()
     const regex = new RegExp("^([0-9]{2}:){2}[0-9]{2}$")
+    let idC = ''
 
 
-     //Fonction qui initialise la course et rempli la sélection pays via Ajax
     function raceCountryInit(){
+        //Fonction qui initialise la course et rempli la sélection pays via Ajax
         fetch('./rqListePays.php')
             .then(res => res.json())
             .then(function(res){
@@ -201,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function(){
         const trToFill = Array.from(document.querySelectorAll('tr'))
 
         trToFill.map(function(row) {
-            if(row.getAttribute('id') !== 'dog_row' ){
+            if(row.getAttribute('id') !== 'dog_row'){
                 const raceStop = document.createElement('input')
                 raceStop.type = 'button'
                 raceStop.className = 'race_stop'
@@ -222,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function raceBeginning() {
+        // Sélection des inputs d'affichage du temps
         const timerDisplay = document.querySelector('#timer_display')
         const timerDisplayRemaining = document.querySelector('#timer_display_remaining')
 
@@ -233,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         // Action si le temps limite est atteint
         countdown.addEventListener('targetAchieved', function() {
+            postRace()
             const allTr = Array.from(document.querySelectorAll('table tr'))
             allTr.map(function(tr) {
                 if(tr.firstChild && tr.firstChild.className === 'race_stop'){
@@ -258,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function raceEnd(){
+        // Click sur stop, suppresssion des boutons et affichage du temps
         const currentRow = this.parentNode
         const result = document.createElement('div')
         currentRow.firstChild.remove()
@@ -267,6 +271,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function raceAborted(){
+        // Click abandon, suppression des boutons et affichage du resultat
         const currentRow = this.parentNode
         const result = document.createElement('div')
         currentRow.firstChild.remove()
@@ -275,6 +280,65 @@ document.addEventListener('DOMContentLoaded', function(){
         currentRow.insertBefore(result, currentRow.firstChild)
     }
 
+    function postRace(){
+        // Formatage de la date pour la rendre compatible avec la DB
+        const date = new Date()
+        const dateC = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate()
+        // Sélection de tous les lignes du tableau
+        const dogs = Array.from(document.querySelectorAll('table tr'))
+
+        // Création de l'objet représentant la course
+        const raceData = {
+            nomC: raceName.value,
+            descC: 'Course ' + raceName.value,
+            dateC: dateC,
+            lieuC: raceCountry.value
+        }
+
+        // Requete Post pour enregistrer la course
+        fetch('./rqInsertCourse.php', {
+            method: 'post',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }),
+            body: 'course='+JSON.stringify(raceData)
+        })
+            .then(res=>res.json())
+            .then(res => {
+                // Id de la course
+                idC = res
+                // Pour chaque participants on appelle post les resultats
+                dogs.map(function(dog) {
+                    if(dog.getAttribute('id') !== 'dog_row'){
+                        postResults(dog)
+                    }
+                })
+            })
+    }
+
+    function postResults(dog){
+        // Sélection du chien en paramètre dans la liste
+        const currentDog = dogList.find(function(currentDog) {
+            return currentDog.idA === dog.getAttribute('id')
+        })
+
+        // Création de l'objet représentant le résultat de chaque participant
+        const raceResults = {
+            idC: idC,
+            idA: currentDog.idA,
+            temps: dog.firstChild.innerText === 'Abandon' ? raceDuration.value : dog.firstChild.innerText,
+            statut: dog.firstChild.innerText === 'Abandon' ? 'A' : 'T'
+        }
+
+        // Envoi de la requete d'inscription pour chaque résultat
+        fetch('./rqInsertResultat.php', {
+            method: 'post',
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }),
+            body: 'resultat='+JSON.stringify(raceResults)
+        })
+    }
 
 
 
