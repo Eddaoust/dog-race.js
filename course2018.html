@@ -9,16 +9,17 @@
 </head>
 <body>
     <div class="container" style="margin-top: 100px">
+        <h1>Dog Race!</h1>
         <label for="race_name">Nom de la course: </label>
-        <input type="text" id="race_name"><br>
+        <input type="text" id="race_name" class="form-control"><br>
         <label for="race_country">Pays: </label>
-        <select id="race_country"></select><br>
+        <select id="race_country" class="form-control"></select><br>
         <label for="race_duration">Durée de la course: </label>
-        <input type="text" id="race_duration" placeholder="Entrez une durée en seconde" value="00:00:00"><br>
-        <input type="button" id="race_registration" value="Commencer les inscriptions"><br><br>
+        <input type="text" id="race_duration" placeholder="Entrez une durée en seconde" value="00:00:00" class="form-control"><br>
+        <input type="button" id="race_registration" value="Commencer les inscriptions" class="btn btn-primary"><br><br>
     </div>
-    <div class="container">
-        <table>
+    <div class="container mt-5">
+        <table class="table table-striped">
             <tbody class="dog_container">
                 <tr id="dog_row"></tr>
             </tbody>

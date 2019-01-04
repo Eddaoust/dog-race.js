@@ -49,17 +49,20 @@ document.addEventListener('DOMContentLoaded', function(){
             label.innerText = 'Choississez un chien'
             container.appendChild(label)
             const dogSelect = document.createElement('select')
-            dogSelect.setAttribute('id', 'dog_select')
+            dogSelect.id = 'dog_select'
+            dogSelect.className = 'form-control'
             container.appendChild(dogSelect)
             const btnDogRegistration = document.createElement('input')
             btnDogRegistration.type = 'button'
             btnDogRegistration.value = 'Inscrire'
             btnDogRegistration.id = 'dog_register'
+            btnDogRegistration.className = 'btn btn-success'
             container.appendChild(btnDogRegistration)
             const btnDogEndRegistration = document.createElement('input')
             btnDogEndRegistration.type = 'button'
             btnDogEndRegistration.value = 'Cloturer les inscriptions'
             btnDogEndRegistration.id = 'dog_end_registration'
+            btnDogEndRegistration.className = 'btn btn-danger'
             container.appendChild(btnDogEndRegistration)
 
             raceDurationValue = raceDuration.value.split(':');
@@ -120,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 dogDelete.type = 'button'
                 dogDelete.value = 'Supprimer'
                 dogDelete.id = 'dog_delete'
+                dogDelete.className = 'btn btn-primary'
 
                 // Attribution des données en fonction du chien sélectionné
                 dogId.innerHTML = selectedDog.idA
@@ -169,10 +173,12 @@ document.addEventListener('DOMContentLoaded', function(){
         raceStart.id = 'race_start'
         raceStart.type = 'button'
         raceStart.value = 'Start'
+        raceStart.className = 'btn btn-primary'
         const timerDisplay = document.createElement('input')
         timerDisplay.type = 'text'
         timerDisplay.id = 'timer_display'
         timerDisplay.value = '00:00:00'
+        timerDisplay.className = 'form-control'
         const label = document.createElement('label')
         label.setAttribute('for', 'timer_display_remaining')
         label.innerText = 'Temps restant'
@@ -180,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function(){
         timerDisplayRemaining.type = 'text'
         timerDisplayRemaining.id = 'timer_display_remaining'
         timerDisplayRemaining.value = '00:00:00'
+        timerDisplayRemaining.className = 'form-control'
 
 
         timerDisplayRemaining.value = raceDuration.value
